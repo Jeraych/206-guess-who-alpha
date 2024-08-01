@@ -9,7 +9,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import nz.ac.auckland.se206.GameStateContext;
-import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * Controller class for the room view. Handles user interactions within the room where the user can
@@ -33,15 +32,7 @@ public class RoomController {
    * via text-to-speech.
    */
   @FXML
-  public void initialize() {
-    if (isFirstTimeInit) {
-      TextToSpeech.speak(
-          "Chat with the three customers, and guess who is the "
-              + context.getProfessionToGuess());
-      isFirstTimeInit = false;
-    }
-    lblProfession.setText(context.getProfessionToGuess());
-  }
+  public void initialize() {}
 
   /**
    * Handles the key pressed event.
