@@ -57,7 +57,7 @@ public class App extends Application {
    * @throws IOException if the FXML file is not found
    */
   public static void openChat(MouseEvent event, String profession) throws IOException {
-    FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/chat.fxml"));
+    FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/start.fxml"));
     Parent root = loader.load();
 
     ChatController chatController = loader.getController();
@@ -77,7 +77,7 @@ public class App extends Application {
    */
   @Override
   public void start(final Stage stage) throws IOException {
-    Parent root = loadFxml("room");
+    Parent root = loadFxml("start");
     scene = new Scene(root);
     stage.setScene(scene);
     stage.show();

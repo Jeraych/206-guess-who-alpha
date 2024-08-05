@@ -3,11 +3,11 @@ package nz.ac.auckland.se206.controllers;
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
+import nz.ac.auckland.apiproxy.exceptions.ApiProxyException;
+import nz.ac.auckland.se206.App;
 import nz.ac.auckland.se206.GameStateContext;
 
 /**
@@ -16,13 +16,10 @@ import nz.ac.auckland.se206.GameStateContext;
  */
 public class RoomController {
 
-  @FXML private Rectangle rectCashier;
   @FXML private Rectangle rectPerson1;
   @FXML private Rectangle rectPerson2;
   @FXML private Rectangle rectPerson3;
-  @FXML private Rectangle rectWaitress;
-  @FXML private Label lblProfession;
-  @FXML private Button btnGuess;
+  @FXML private Rectangle rectStatue;
 
   private static boolean isFirstTimeInit = true;
   private static GameStateContext context = new GameStateContext();
@@ -61,9 +58,23 @@ public class RoomController {
    * @throws IOException if there is an I/O error
    */
   @FXML
-  private void handleRectangleClick(MouseEvent event) throws IOException {
+  private void handleRectangleClickPerson1(MouseEvent event) throws IOException {
     Rectangle clickedRectangle = (Rectangle) event.getSource();
-    context.handleRectangleClick(event, clickedRectangle.getId());
+  }
+
+  @FXML
+  private void handleRectangleClickPerson2(MouseEvent event) throws IOException {
+    Rectangle clickedRectangle = (Rectangle) event.getSource();
+  }
+
+  @FXML
+  private void handleRectangleClickPerson3(MouseEvent event) throws IOException {
+    Rectangle clickedRectangle = (Rectangle) event.getSource();
+  }
+
+  @FXML
+  private void handleRectangleClickStatue(MouseEvent event) throws IOException {
+    Rectangle clickedRectangle = (Rectangle) event.getSource();
   }
 
   /**
@@ -75,5 +86,10 @@ public class RoomController {
   @FXML
   private void handleGuessClick(ActionEvent event) throws IOException {
     context.handleGuessClick();
+  }
+
+  @FXML
+  private void startGame(ActionEvent event) throws ApiProxyException, IOException {
+    App.setRoot("room");
   }
 }
