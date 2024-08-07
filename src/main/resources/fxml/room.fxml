@@ -18,7 +18,7 @@
             <Image url="@../images/museum.jpg" />
          </image>
       </ImageView>
-      <Button layoutX="558.0" layoutY="413.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="147.0" style="-fx-background-color: RED;" text="Flaw!" textFill="WHITE">
+      <Button layoutX="558.0" layoutY="413.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="147.0" style="-fx-background-color: BLACK;" text="Flaw!" textFill="WHITE">
          <font>
             <Font size="36.0" />
          </font>
@@ -57,6 +57,11 @@
       <Text fx:id="timer" fill="RED" layoutX="40.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: BOLD;" text="2:00:00" wrappingWidth="175.9144744873047">
          <font>
             <Font size="36.0" />
+         </font>
+      </Text>
+      <Text fx:id="finalCountdown" fill="RED" layoutX="558.0" layoutY="395.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: BOLD;" wrappingWidth="131.93585586547852">
+         <font>
+            <Font size="96.0" />
          </font>
       </Text>
    </children>
