@@ -1,13 +1,16 @@
 package nz.ac.auckland.se206.controllers;
 
 import java.io.IOException;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
-import nz.ac.auckland.apiproxy.exceptions.ApiProxyException;
-import nz.ac.auckland.se206.App;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
 import nz.ac.auckland.se206.GameStateContext;
 
 /**
@@ -20,16 +23,52 @@ public class RoomController {
   @FXML private Rectangle rectPerson2;
   @FXML private Rectangle rectPerson3;
   @FXML private Rectangle rectStatue;
+  @FXML private Text timer;
 
   private static boolean isFirstTimeInit = true;
   private static GameStateContext context = new GameStateContext();
+  private int milliSecond;
+  private int second;
+  private int minute;
+  private Timeline clock;
+  private String timerString;
 
   /**
    * Initializes the room view. If it's the first time initialization, it will provide instructions
    * via text-to-speech.
    */
   @FXML
-  public void initialize() {}
+  public void initialize() {
+
+    milliSecond = 0;
+    second = 0;
+    minute = 0;
+    timerString = "%d:%02d:%02d";
+    timer.setText(
+        Integer.toString(minute)
+            + ":"
+            + Integer.toString(second)
+            + ":"
+            + Integer.toString(milliSecond));
+    clock =
+        new Timeline(
+            new KeyFrame(
+                Duration.millis(10),
+                e -> {
+                  milliSecond++;
+                  if (milliSecond == 100) {
+                    milliSecond = 0;
+                    second++;
+                    if (second == 60) {
+                      second = 0;
+                      minute++;
+                    }
+                  }
+                  timer.setText(String.format(timerString, minute, second, milliSecond));
+                }));
+    clock.setCycleCount(Animation.INDEFINITE);
+    clock.play();
+  }
 
   /**
    * Handles the key pressed event.
@@ -86,10 +125,5 @@ public class RoomController {
   @FXML
   private void handleGuessClick(ActionEvent event) throws IOException {
     context.handleGuessClick();
-  }
-
-  @FXML
-  private void startGame(ActionEvent event) throws ApiProxyException, IOException {
-    App.setRoot("room");
   }
 }
