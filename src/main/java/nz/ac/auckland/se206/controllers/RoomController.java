@@ -58,6 +58,11 @@ public class RoomController {
   private boolean countdownEnd;
   private int finalSecond;
   private boolean clueFound = false;
+  private boolean greeting1 = true;
+  private boolean greeting2 = true;
+  private boolean greeting3 = true;
+  private boolean greeting4 = true;
+  private String me;
 
   private ChatCompletionRequest chatCompletionRequest;
   private String profession;
@@ -68,6 +73,9 @@ public class RoomController {
    */
   @FXML
   public void initialize() {
+    me = "You";
+    ChatMessage start = new ChatMessage(me, "Hurry, we have two minutes till suspects escape.");
+    appendChatMessage(start);
     timerEnd = false;
     milliSecond = 0;
     second = 0;
@@ -167,11 +175,15 @@ public class RoomController {
     rectPerson2.setStyle("-fx-opacity: 0");
     rectPerson3.setStyle("-fx-opacity: 0");
     rectStatue.setStyle("-fx-opacity: 0");
-    txtChat.appendText(
-        "A man is staring at the description card mindlessly. You decide to name him Suspect"
-            + " 2.\n\n");
+    if (greeting1) {
+      appendSystemMessage(
+          "A man is staring at the description card mindlessly. You decide to name him Suspect"
+              + " 2");
+      greeting1 = false;
+    }
+
     if (clueFound) {
-      txtChat.appendText("You notice Suspect 1 has got some white dust on his shirt.\n\n");
+      appendSystemMessage("You notice Suspect 1 has got some white dust on his shirt.");
     }
   }
 
@@ -182,8 +194,11 @@ public class RoomController {
     rectPerson1.setStyle("-fx-opacity: 0");
     rectPerson3.setStyle("-fx-opacity: 0");
     rectStatue.setStyle("-fx-opacity: 0");
-    txtChat.appendText(
-        "You notice a man wondering around looking for something. You noted him as Suspect 1\n\n");
+    if (greeting2) {
+      appendSystemMessage(
+          "You notice a man wondering around looking for something. You noted him as Suspect 1");
+      greeting2 = false;
+    }
   }
 
   @FXML
@@ -193,9 +208,12 @@ public class RoomController {
     rectPerson2.setStyle("-fx-opacity: 0");
     rectPerson1.setStyle("-fx-opacity: 0");
     rectStatue.setStyle("-fx-opacity: 0");
-    txtChat.appendText(
-        "A beautiful woman works around the museum, she seems interested in those statues. You"
-            + " called her Suspect 3 anyways\n\n");
+    if (greeting3) {
+      appendSystemMessage(
+          "A beautiful woman works around the museum, she seems interested in those statues. You"
+              + " called her Suspect 3 anyways");
+      greeting3 = false;
+    }
   }
 
   @FXML
@@ -205,8 +223,11 @@ public class RoomController {
     rectPerson2.setStyle("-fx-opacity: 0");
     rectPerson3.setStyle("-fx-opacity: 0");
     rectPerson1.setStyle("-fx-opacity: 0");
-    txtChat.appendText(
-        new String(Files.readAllBytes(Paths.get("src\\main\\resources\\prompts\\chatClue.txt"))));
+    if (greeting4) {
+      appendSystemMessage(
+          new String(Files.readAllBytes(Paths.get("src\\main\\resources\\prompts\\chatClue.txt"))));
+      greeting4 = false;
+    }
   }
 
   /**
@@ -262,6 +283,15 @@ public class RoomController {
   }
 
   /**
+   * Appends a chat message to the chat text area.
+   *
+   * @param msg the chat message to append
+   */
+  private void appendSystemMessage(String msg) {
+    txtChat.appendText("[" + msg + "]\n\n");
+  }
+
+  /**
    * Runs the GPT model with a given chat message.
    *
    * @param msg the chat message to process
@@ -297,7 +327,7 @@ public class RoomController {
       return;
     }
     txtInput.clear();
-    ChatMessage msg = new ChatMessage("user", message);
+    ChatMessage msg = new ChatMessage("You", message);
     appendChatMessage(msg);
     runGpt(msg);
   }

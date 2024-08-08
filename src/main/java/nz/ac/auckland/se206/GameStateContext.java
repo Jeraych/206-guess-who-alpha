@@ -22,7 +22,6 @@ import org.yaml.snakeyaml.Yaml;
 public class GameStateContext {
 
   private final String rectIdToGuess;
-  private final String professionToGuess;
   private final Map<String, String> rectanglesToProfession;
   private final GameStarted gameStartedState;
   private final Guessing guessingState;
@@ -64,10 +63,7 @@ public class GameStateContext {
     rectanglesToProfession.put("rectPerson2", randomProfessionsArray[1]);
     rectanglesToProfession.put("rectPerson3", randomProfessionsArray[2]);
 
-    int randomNumber = random.nextInt(3);
-    rectIdToGuess =
-        randomNumber == 0 ? "rectPerson1" : ((randomNumber == 1) ? "rectPerson2" : "rectPerson3");
-    professionToGuess = rectanglesToProfession.get(rectIdToGuess);
+    rectIdToGuess = "rectPerson2";
   }
 
   /**
@@ -104,15 +100,6 @@ public class GameStateContext {
    */
   public GameState getGameOverState() {
     return gameOverState;
-  }
-
-  /**
-   * Gets the profession to be guessed.
-   *
-   * @return the profession to guess
-   */
-  public String getProfessionToGuess() {
-    return professionToGuess;
   }
 
   /**
