@@ -23,33 +23,33 @@
             <Font size="36.0" />
          </font>
       </Button>
-      <Button layoutX="557.0" layoutY="535.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="147.0" text="Dialog">
+      <Button fx:id="btnSend" layoutX="557.0" layoutY="535.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="147.0" text="Dialog">
          <font>
             <Font size="25.0" />
          </font>
       </Button>
-      <TextArea editable="false" layoutX="-2.0" layoutY="412.0" prefHeight="115.0" prefWidth="561.0" wrapText="true" />
-      <TextField layoutX="-1.0" layoutY="534.0" prefHeight="78.0" prefWidth="559.0" promptText="I'm wondering...">
+      <TextArea fx:id="txtChat" editable="false" layoutX="-2.0" layoutY="412.0" prefHeight="115.0" prefWidth="561.0" wrapText="true" />
+      <TextField fx:id="txtInput" layoutX="-1.0" layoutY="534.0" prefHeight="78.0" prefWidth="559.0" promptText="I'm wondering...">
          <font>
             <Font size="15.0" />
          </font>
       </TextField>
-      <Rectangle fx:id="rectPerson2" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="135.0" layoutX="350.0" layoutY="152.0" onMouseClicked="#handleRectangleClickPerson2" opacity="0.2" stroke="BLACK" strokeType="INSIDE" width="58.0">
+      <Rectangle fx:id="rectPerson2" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="135.0" layoutX="350.0" layoutY="152.0" onMouseClicked="#handleRectangleClickPerson2" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="58.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </Rectangle>
-      <Rectangle fx:id="rectPerson3" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="125.0" layoutX="218.0" layoutY="287.0" onMouseClicked="#handleRectangleClickPerson3" opacity="0.2" stroke="BLACK" strokeType="INSIDE" width="65.0">
+      <Rectangle fx:id="rectPerson3" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="125.0" layoutX="218.0" layoutY="287.0" onMouseClicked="#handleRectangleClickPerson3" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="65.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </Rectangle>
-      <Rectangle fx:id="rectPerson1" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="139.0" layoutX="113.0" layoutY="160.0" onMouseClicked="#handleRectangleClickPerson1" opacity="0.2" stroke="BLACK" strokeType="INSIDE" width="58.0">
+      <Rectangle fx:id="rectPerson1" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="139.0" layoutX="113.0" layoutY="160.0" onMouseClicked="#handleRectangleClickPerson1" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="58.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </Rectangle>
-      <Rectangle fx:id="rectStatue" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="84.0" layoutX="620.0" layoutY="150.0" onMouseClicked="#handleRectangleClickStatue" opacity="0.2" stroke="BLACK" strokeType="INSIDE" width="63.0">
+      <Rectangle fx:id="rectStatue" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="84.0" layoutX="620.0" layoutY="150.0" onMouseClicked="#handleRectangleClickStatue" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="63.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>

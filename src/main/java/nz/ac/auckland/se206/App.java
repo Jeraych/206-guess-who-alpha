@@ -8,7 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import nz.ac.auckland.se206.controllers.ChatController;
 
 /**
  * This is the entry point of the JavaFX application. This class initializes and runs the JavaFX
@@ -59,9 +58,6 @@ public class App extends Application {
   public static void openChat(MouseEvent event, String profession) throws IOException {
     FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/start.fxml"));
     Parent root = loader.load();
-
-    ChatController chatController = loader.getController();
-    chatController.setProfession(profession);
 
     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     scene = new Scene(root);
