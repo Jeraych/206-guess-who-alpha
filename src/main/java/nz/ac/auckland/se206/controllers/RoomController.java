@@ -31,7 +31,7 @@ import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * Controller class for the room view. Handles user interactions within the room where the user can
- * chat with customers and guess their profession.
+ * chat with customers and guess their name.
  */
 public class RoomController {
 
@@ -63,16 +63,21 @@ public class RoomController {
   private boolean greeting3 = true;
   private boolean greeting4 = true;
   private String me;
+  private boolean setPerson1 = false;
+  private boolean setPerson2 = false;
+  private boolean setPerson3 = false;
 
   private ChatCompletionRequest chatCompletionRequest;
-  private String profession;
+  private String name1;
 
   /**
    * Initializes the room view. If it's the first time initialization, it will provide instructions
    * via text-to-speech.
+   *
+   * @throws ApiProxyException
    */
   @FXML
-  public void initialize() {
+  public void initialize() throws ApiProxyException {
     me = "You";
     ChatMessage start = new ChatMessage(me, "Hurry, we have two minutes till suspects escape.");
     appendChatMessage(start);
@@ -171,6 +176,7 @@ public class RoomController {
   @FXML
   private void handleRectangleClickPerson1(MouseEvent event) throws IOException {
     Rectangle clickedRectangle = (Rectangle) event.getSource();
+
     clickedRectangle.setStyle("-fx-opacity: 0.2");
     rectPerson2.setStyle("-fx-opacity: 0");
     rectPerson3.setStyle("-fx-opacity: 0");
@@ -185,6 +191,11 @@ public class RoomController {
     if (clueFound) {
       appendSystemMessage("You notice Suspect 1 has got some white dust on his shirt.");
     }
+    setPerson1 = true;
+    setPerson2 = false;
+    setPerson3 = false;
+    setName1(context.getName("rectPerson1"));
+    enableChat();
   }
 
   @FXML
@@ -199,6 +210,11 @@ public class RoomController {
           "You notice a man wondering around looking for something. You noted him as Suspect 1");
       greeting2 = false;
     }
+    setPerson2 = true;
+    setPerson1 = false;
+    setPerson3 = false;
+    setName1(context.getName("rectPerson2"));
+    enableChat();
   }
 
   @FXML
@@ -214,6 +230,11 @@ public class RoomController {
               + " called her Suspect 3 anyways");
       greeting3 = false;
     }
+    setPerson3 = true;
+    setPerson2 = false;
+    setPerson1 = false;
+    setName1(context.getName("rectPerson3"));
+    enableChat();
   }
 
   @FXML
@@ -227,7 +248,22 @@ public class RoomController {
       appendSystemMessage(
           new String(Files.readAllBytes(Paths.get("src\\main\\resources\\prompts\\chatClue.txt"))));
       greeting4 = false;
+    } else {
+      appendSystemMessage("You got nothing more than white dusts on your hands.");
     }
+    disableChat();
+  }
+
+  @FXML
+  private void enableChat() {
+    txtInput.setDisable(false);
+    btnSend.setDisable(false);
+  }
+
+  @FXML
+  private void disableChat() {
+    txtInput.setDisable(true);
+    btnSend.setDisable(true);
   }
 
   /**
@@ -242,23 +278,23 @@ public class RoomController {
   }
 
   /**
-   * Generates the system prompt based on the profession.
+   * Generates the system prompt based on the name.
    *
    * @return the system prompt string
    */
   private String getSystemPrompt() {
     Map<String, String> map = new HashMap<>();
-    map.put("profession", profession);
-    return PromptEngineering.getPrompt("chat.txt", map);
+    map.put("name", name1);
+    return PromptEngineering.getPrompt("chat1.txt", map);
   }
 
   /**
-   * Sets the profession for the chat context and initializes the ChatCompletionRequest.
+   * Sets the name for the chat context and initializes the ChatCompletionRequest.
    *
-   * @param profession the profession to set
+   * @param name the name to set
    */
-  public void setProfession(String profession) {
-    this.profession = profession;
+  public void setName1(String name) {
+    this.name1 = name;
     try {
       ApiProxyConfig config = ApiProxyConfig.readConfig();
       chatCompletionRequest =
@@ -327,7 +363,7 @@ public class RoomController {
       return;
     }
     txtInput.clear();
-    ChatMessage msg = new ChatMessage("You", message);
+    ChatMessage msg = new ChatMessage(me, message);
     appendChatMessage(msg);
     runGpt(msg);
   }

@@ -23,13 +23,13 @@
             <Font size="36.0" />
          </font>
       </Button>
-      <Button fx:id="btnSend" layoutX="557.0" layoutY="535.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="147.0" text="Dialog">
+      <Button fx:id="btnSend" disable="true" layoutX="557.0" layoutY="535.0" mnemonicParsing="false" onAction="#onSendMessage" prefHeight="75.0" prefWidth="147.0" text="Dialog">
          <font>
             <Font size="25.0" />
          </font>
       </Button>
       <TextArea fx:id="txtChat" editable="false" layoutX="-2.0" layoutY="412.0" prefHeight="115.0" prefWidth="561.0" wrapText="true" />
-      <TextField fx:id="txtInput" layoutX="-1.0" layoutY="534.0" prefHeight="78.0" prefWidth="559.0" promptText="I'm wondering...">
+      <TextField fx:id="txtInput" disable="true" layoutX="-1.0" layoutY="534.0" prefHeight="78.0" prefWidth="559.0" promptText="I'm wondering...">
          <font>
             <Font size="15.0" />
          </font>

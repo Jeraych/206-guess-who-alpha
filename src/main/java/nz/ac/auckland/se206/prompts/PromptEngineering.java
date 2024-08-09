@@ -25,7 +25,7 @@ public class PromptEngineering {
   public static String getPrompt(String promptId, Map<String, String> data) {
     try {
       // Load the prompt template file from resources
-      URL resourceUrl = PromptEngineering.class.getClassLoader().getResource("prompts/chat.txt");
+      URL resourceUrl = PromptEngineering.class.getClassLoader().getResource("prompts/" + promptId);
       String template = loadTemplate(resourceUrl.toURI());
       // Fill the template with the provided data
       return fillTemplate(template, data);

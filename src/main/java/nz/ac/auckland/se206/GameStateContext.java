@@ -17,18 +17,18 @@ import org.yaml.snakeyaml.Yaml;
 
 /**
  * Context class for managing the state of the game. Handles transitions between different game
- * states and maintains game data such as the professions and rectangle IDs.
+ * states and maintains game data such as the names and rectangle IDs.
  */
 public class GameStateContext {
 
   private final String rectIdToGuess;
-  private final Map<String, String> rectanglesToProfession;
+  private final Map<String, String> rectanglesToName;
   private final GameStarted gameStartedState;
   private final Guessing guessingState;
   private final GameOver gameOverState;
   private GameState gameState;
 
-  /** Constructs a new GameStateContext and initializes the game states and professions. */
+  /** Constructs a new GameStateContext and initializes the game states and names. */
   public GameStateContext() {
     gameStartedState = new GameStarted(this);
     guessingState = new Guessing(this);
@@ -38,7 +38,7 @@ public class GameStateContext {
     Map<String, Object> obj = null;
     Yaml yaml = new Yaml();
     try (InputStream inputStream =
-        GameStateContext.class.getClassLoader().getResourceAsStream("data/professions.yaml")) {
+        GameStateContext.class.getClassLoader().getResourceAsStream("data/names.yaml")) {
       if (inputStream == null) {
         throw new IllegalStateException("File not found!");
       }
@@ -48,20 +48,20 @@ public class GameStateContext {
     }
 
     @SuppressWarnings("unchecked")
-    List<String> professions = (List<String>) obj.get("professions");
+    List<String> names = (List<String>) obj.get("names");
 
     Random random = new Random();
-    Set<String> randomProfessions = new HashSet<>();
-    while (randomProfessions.size() < 3) {
-      String profession = professions.get(random.nextInt(professions.size()));
-      randomProfessions.add(profession);
+    Set<String> randomNames = new HashSet<>();
+    while (randomNames.size() < 3) {
+      String name = names.get(random.nextInt(names.size()));
+      randomNames.add(name);
     }
 
-    String[] randomProfessionsArray = randomProfessions.toArray(new String[3]);
-    rectanglesToProfession = new HashMap<>();
-    rectanglesToProfession.put("rectPerson1", randomProfessionsArray[0]);
-    rectanglesToProfession.put("rectPerson2", randomProfessionsArray[1]);
-    rectanglesToProfession.put("rectPerson3", randomProfessionsArray[2]);
+    String[] randomNamesArray = randomNames.toArray(new String[3]);
+    rectanglesToName = new HashMap<>();
+    rectanglesToName.put("rectPerson1", randomNamesArray[0]);
+    rectanglesToName.put("rectPerson2", randomNamesArray[1]);
+    rectanglesToName.put("rectPerson3", randomNamesArray[2]);
 
     rectIdToGuess = "rectPerson2";
   }
@@ -112,13 +112,13 @@ public class GameStateContext {
   }
 
   /**
-   * Gets the profession associated with a specific rectangle ID.
+   * Gets the name associated with a specific rectangle ID.
    *
    * @param rectangleId the rectangle ID
-   * @return the profession associated with the rectangle ID
+   * @return the name associated with the rectangle ID
    */
-  public String getProfession(String rectangleId) {
-    return rectanglesToProfession.get(rectangleId);
+  public String getName(String rectangleId) {
+    return rectanglesToName.get(rectangleId);
   }
 
   /**
