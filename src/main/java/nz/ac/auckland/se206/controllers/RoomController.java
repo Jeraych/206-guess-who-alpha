@@ -210,6 +210,7 @@ public class RoomController {
     if (gameEnd || chatting) {
       return;
     }
+    enableChat();
     clickedRectangle = (Rectangle) event.getSource();
     if (clickedRectangle == rectPerson1) {
       setPerson1 = true;
@@ -322,6 +323,7 @@ public class RoomController {
       rectPerson3.setStyle("-fx-opacity: 0");
       rectPerson1.setStyle("-fx-opacity: 0");
       interactedStatue = true;
+      clueFound = true;
       setPerson1 = false;
       setPerson2 = false;
       setPerson3 = false;
