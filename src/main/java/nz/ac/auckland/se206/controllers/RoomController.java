@@ -27,7 +27,6 @@ import nz.ac.auckland.apiproxy.config.ApiProxyConfig;
 import nz.ac.auckland.apiproxy.exceptions.ApiProxyException;
 import nz.ac.auckland.se206.GameStateContext;
 import nz.ac.auckland.se206.prompts.PromptEngineering;
-import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * Controller class for the room view. Handles user interactions within the room where the user can
@@ -67,8 +66,10 @@ public class RoomController {
   private boolean setPerson2 = false;
   private boolean setPerson3 = false;
 
-  private ChatCompletionRequest chatCompletionRequest;
-  private String name1;
+  private ChatCompletionRequest chatCompletionRequest1;
+  private ChatCompletionRequest chatCompletionRequest2;
+  private ChatCompletionRequest chatCompletionRequest3;
+  private String name;
 
   /**
    * Initializes the room view. If it's the first time initialization, it will provide instructions
@@ -79,7 +80,27 @@ public class RoomController {
   @FXML
   public void initialize() throws ApiProxyException {
     me = "You";
-    ChatMessage start = new ChatMessage(me, "Hurry, we have two minutes till suspects escape.");
+    ApiProxyConfig config = ApiProxyConfig.readConfig();
+    chatCompletionRequest1 =
+        new ChatCompletionRequest(config)
+            .setN(1)
+            .setTemperature(0.2)
+            .setTopP(0.5)
+            .setMaxTokens(100);
+    chatCompletionRequest2 =
+        new ChatCompletionRequest(config)
+            .setN(1)
+            .setTemperature(0.2)
+            .setTopP(0.5)
+            .setMaxTokens(100);
+    chatCompletionRequest3 =
+        new ChatCompletionRequest(config)
+            .setN(1)
+            .setTemperature(0.2)
+            .setTopP(0.5)
+            .setMaxTokens(100);
+    ChatMessage start =
+        new ChatMessage("user", "Hurry, we have two minutes till suspects escape.", me);
     appendChatMessage(start);
     timerEnd = false;
     milliSecond = 0;
@@ -133,18 +154,6 @@ public class RoomController {
                   finalCountdown.setText(Integer.toString(finalSecond));
                 }));
     countdown.setCycleCount(Animation.INDEFINITE);
-
-    Task<Void> timerCountdown =
-        new Task<Void>() {
-
-          @Override
-          protected Void call() throws Exception {
-            return null;
-          }
-        };
-    Thread timerThread = new Thread(timerCountdown);
-    timerThread.setDaemon(true);
-    timerThread.start();
   }
 
   /**
@@ -176,65 +185,105 @@ public class RoomController {
   @FXML
   private void handleRectangleClickPerson1(MouseEvent event) throws IOException {
     Rectangle clickedRectangle = (Rectangle) event.getSource();
-
+    name = context.getName("rectPerson1");
     clickedRectangle.setStyle("-fx-opacity: 0.2");
     rectPerson2.setStyle("-fx-opacity: 0");
     rectPerson3.setStyle("-fx-opacity: 0");
     rectStatue.setStyle("-fx-opacity: 0");
+    setPerson1 = true;
+    setPerson2 = false;
+    setPerson3 = false;
+
+    Task<Void> generateResponse =
+        new Task<Void>() {
+
+          @Override
+          protected Void call() throws Exception {
+            setName(name, "chat1.txt", chatCompletionRequest1);
+            enableChat();
+            return null;
+          }
+        };
+    Thread responseThread = new Thread(generateResponse);
+
     if (greeting1) {
       appendSystemMessage(
           "A man is staring at the description card mindlessly. You decide to name him Suspect"
               + " 2");
       greeting1 = false;
+      responseThread.setDaemon(true);
+      responseThread.start();
     }
 
     if (clueFound) {
       appendSystemMessage("You notice Suspect 1 has got some white dust on his shirt.");
     }
-    setPerson1 = true;
-    setPerson2 = false;
-    setPerson3 = false;
-    setName1(context.getName("rectPerson1"));
-    enableChat();
   }
 
   @FXML
   private void handleRectangleClickPerson2(MouseEvent event) throws IOException {
     Rectangle clickedRectangle = (Rectangle) event.getSource();
+    name = context.getName("rectPerson2");
     clickedRectangle.setStyle("-fx-opacity: 0.2");
     rectPerson1.setStyle("-fx-opacity: 0");
     rectPerson3.setStyle("-fx-opacity: 0");
     rectStatue.setStyle("-fx-opacity: 0");
+    setPerson2 = true;
+    setPerson1 = false;
+    setPerson3 = false;
+
+    Task<Void> generateResponse =
+        new Task<Void>() {
+
+          @Override
+          protected Void call() throws Exception {
+            setName(name, "chat2.txt", chatCompletionRequest2);
+            enableChat();
+            return null;
+          }
+        };
+    Thread responseThread = new Thread(generateResponse);
     if (greeting2) {
       appendSystemMessage(
           "You notice a man wondering around looking for something. You noted him as Suspect 1");
       greeting2 = false;
+      responseThread.setDaemon(true);
+      responseThread.start();
     }
-    setPerson2 = true;
-    setPerson1 = false;
-    setPerson3 = false;
-    setName1(context.getName("rectPerson2"));
-    enableChat();
   }
 
   @FXML
   private void handleRectangleClickPerson3(MouseEvent event) throws IOException {
     Rectangle clickedRectangle = (Rectangle) event.getSource();
+    name = context.getName("rectPerson3");
     clickedRectangle.setStyle("-fx-opacity: 0.2");
     rectPerson2.setStyle("-fx-opacity: 0");
     rectPerson1.setStyle("-fx-opacity: 0");
     rectStatue.setStyle("-fx-opacity: 0");
+    setPerson3 = true;
+    setPerson2 = false;
+    setPerson1 = false;
+
+    Task<Void> generateResponse =
+        new Task<Void>() {
+
+          @Override
+          protected Void call() throws Exception {
+            setName(name, "chat3.txt", chatCompletionRequest3);
+            enableChat();
+            return null;
+          }
+        };
+    Thread responseThread = new Thread(generateResponse);
+
     if (greeting3) {
       appendSystemMessage(
           "A beautiful woman works around the museum, she seems interested in those statues. You"
               + " called her Suspect 3 anyways");
       greeting3 = false;
+      responseThread.setDaemon(true);
+      responseThread.start();
     }
-    setPerson3 = true;
-    setPerson2 = false;
-    setPerson1 = false;
-    setName1(context.getName("rectPerson3"));
-    enableChat();
   }
 
   @FXML
@@ -282,10 +331,10 @@ public class RoomController {
    *
    * @return the system prompt string
    */
-  private String getSystemPrompt() {
+  private String getSystemPrompt(String id) {
     Map<String, String> map = new HashMap<>();
-    map.put("name", name1);
-    return PromptEngineering.getPrompt("chat1.txt", map);
+    map.put("name", name);
+    return PromptEngineering.getPrompt(id, map);
   }
 
   /**
@@ -293,17 +342,11 @@ public class RoomController {
    *
    * @param name the name to set
    */
-  public void setName1(String name) {
-    this.name1 = name;
+  public void setName(String name, String id, ChatCompletionRequest chatCompletionRequest) {
+    this.name = name;
     try {
-      ApiProxyConfig config = ApiProxyConfig.readConfig();
-      chatCompletionRequest =
-          new ChatCompletionRequest(config)
-              .setN(1)
-              .setTemperature(0.2)
-              .setTopP(0.5)
-              .setMaxTokens(100);
-      runGpt(new ChatMessage("system", getSystemPrompt()));
+
+      runGpt(new ChatMessage("system", getSystemPrompt(id), name), chatCompletionRequest);
     } catch (ApiProxyException e) {
       e.printStackTrace();
     }
@@ -315,7 +358,7 @@ public class RoomController {
    * @param msg the chat message to append
    */
   private void appendChatMessage(ChatMessage msg) {
-    txtChat.appendText(msg.getRole() + ": " + msg.getContent() + "\n\n");
+    txtChat.appendText(msg.getName() + ": " + msg.getContent() + "\n\n");
   }
 
   /**
@@ -334,14 +377,16 @@ public class RoomController {
    * @return the response chat message
    * @throws ApiProxyException if there is an error communicating with the API proxy
    */
-  private ChatMessage runGpt(ChatMessage msg) throws ApiProxyException {
+  private ChatMessage runGpt(ChatMessage msg, ChatCompletionRequest chatCompletionRequest)
+      throws ApiProxyException {
     chatCompletionRequest.addMessage(msg);
     try {
       ChatCompletionResult chatCompletionResult = chatCompletionRequest.execute();
       Choice result = chatCompletionResult.getChoices().iterator().next();
+      result.getChatMessage().setName(name);
       chatCompletionRequest.addMessage(result.getChatMessage());
       appendChatMessage(result.getChatMessage());
-      TextToSpeech.speak(result.getChatMessage().getContent());
+      // TextToSpeech.speak(result.getChatMessage().getContent());
       return result.getChatMessage();
     } catch (ApiProxyException e) {
       e.printStackTrace();
@@ -362,9 +407,17 @@ public class RoomController {
     if (message.isEmpty()) {
       return;
     }
+    ChatCompletionRequest chatCompletionRequest;
+    if (setPerson1) {
+      chatCompletionRequest = chatCompletionRequest1;
+    } else if (setPerson2) {
+      chatCompletionRequest = chatCompletionRequest2;
+    } else {
+      chatCompletionRequest = chatCompletionRequest3;
+    }
     txtInput.clear();
-    ChatMessage msg = new ChatMessage(me, message);
+    ChatMessage msg = new ChatMessage("user", message, me);
     appendChatMessage(msg);
-    runGpt(msg);
+    runGpt(msg, chatCompletionRequest);
   }
 }

@@ -33,6 +33,8 @@ public class ChatCompletionRequest {
     this.config = config;
   }
 
+  
+
   public ChatCompletionRequest addMessage(String role, String content) {
     return addMessage(new ChatMessage(role, content));
   }
