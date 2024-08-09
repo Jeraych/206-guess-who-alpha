@@ -63,7 +63,7 @@ public class GameStateContext {
     rectanglesToName.put("rectPerson2", randomNamesArray[1]);
     rectanglesToName.put("rectPerson3", randomNamesArray[2]);
 
-    rectIdToGuess = "rectPerson2";
+    rectIdToGuess = randomNamesArray[1];
   }
 
   /**

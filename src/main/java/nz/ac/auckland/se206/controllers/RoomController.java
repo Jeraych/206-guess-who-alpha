@@ -44,6 +44,7 @@ public class RoomController {
   @FXML private TextArea txtChat;
   @FXML private TextField txtInput;
   @FXML private Button btnSend;
+  @FXML private Button btnFlaw;
 
   private static boolean isFirstTimeInit = true;
   private static GameStateContext context = new GameStateContext();
@@ -65,6 +66,9 @@ public class RoomController {
   private boolean setPerson1 = false;
   private boolean setPerson2 = false;
   private boolean setPerson3 = false;
+  private boolean setStatue = false;
+  private Rectangle clickedRectangle;
+  private boolean gameEnd;
 
   private ChatCompletionRequest chatCompletionRequest1;
   private ChatCompletionRequest chatCompletionRequest2;
@@ -80,6 +84,7 @@ public class RoomController {
   @FXML
   public void initialize() throws ApiProxyException {
     me = "You";
+    gameEnd = false;
     ApiProxyConfig config = ApiProxyConfig.readConfig();
     chatCompletionRequest1 =
         new ChatCompletionRequest(config)
@@ -102,6 +107,7 @@ public class RoomController {
     ChatMessage start =
         new ChatMessage("user", "Hurry, we have two minutes till suspects escape.", me);
     appendChatMessage(start);
+    // TextToSpeech.speak(start.getContent());
     timerEnd = false;
     milliSecond = 0;
     second = 0;
@@ -113,12 +119,15 @@ public class RoomController {
             new KeyFrame(
                 Duration.millis(10),
                 e -> {
+                  if (gameEnd) {
+                    clock.stop();
+                  }
                   milliSecond--;
                   if (milliSecond < 0) {
                     milliSecond = 99;
                     second--;
                     if (second < 0) {
-                      second = 59;
+                      second = 1;
                       minute--;
                       if (minute < 0) {
                         milliSecond = 0;
@@ -126,7 +135,12 @@ public class RoomController {
                         minute = 0;
                         timerEnd = true;
                         clock.stop();
-
+                        ChatMessage msg =
+                            new ChatMessage("user", "Arrest a suspect, quick!", "You");
+                        btnFlaw.setStyle("-fx-font-size: 28;" + "-fx-color: BLACK;");
+                        btnFlaw.setText("Arrest!");
+                        // TextToSpeech.speak(msg.getContent());
+                        appendChatMessage(msg);
                         countdown.play();
                       }
                     }
@@ -145,11 +159,20 @@ public class RoomController {
                 Duration.seconds(1),
                 event -> {
                   finalCountdown.setText(Integer.toString(finalSecond));
+                  if (gameEnd) {
+                    clock.stop();
+                  }
+
                   finalSecond--;
                   if (finalSecond < 0) {
                     finalSecond = 0;
                     countdownEnd = true;
                     countdown.stop();
+                    ChatMessage msgWin = new ChatMessage("user", "Suspects escaped. (Sigh)", "You");
+                    // TextToSpeech.speak(msgWin.getContent());
+                    appendChatMessage(msgWin);
+                    appendSystemMessage("You lost the game.");
+                    gameEnd = true;
                   }
                   finalCountdown.setText(Integer.toString(finalSecond));
                 }));
@@ -183,124 +206,132 @@ public class RoomController {
    * @throws IOException if there is an I/O error
    */
   @FXML
-  private void handleRectangleClickPerson1(MouseEvent event) throws IOException {
-    Rectangle clickedRectangle = (Rectangle) event.getSource();
-    name = context.getName("rectPerson1");
-    clickedRectangle.setStyle("-fx-opacity: 0.2");
-    rectPerson2.setStyle("-fx-opacity: 0");
-    rectPerson3.setStyle("-fx-opacity: 0");
-    rectStatue.setStyle("-fx-opacity: 0");
-    setPerson1 = true;
-    setPerson2 = false;
-    setPerson3 = false;
+  private void handleRectangleClick(MouseEvent event) throws IOException {
+    if (gameEnd) {
+      return;
+    }
+    clickedRectangle = (Rectangle) event.getSource();
+    if (clickedRectangle == rectPerson1) {
+      setPerson1 = true;
+      name = context.getName("rectPerson1");
+      clickedRectangle.setStyle("-fx-opacity: 0.2");
+      rectPerson2.setStyle("-fx-opacity: 0");
+      rectPerson3.setStyle("-fx-opacity: 0");
+      rectStatue.setStyle("-fx-opacity: 0");
+      setPerson1 = true;
+      setPerson2 = false;
+      setPerson3 = false;
+      setStatue = false;
 
-    Task<Void> generateResponse =
-        new Task<Void>() {
+      Task<Void> generateResponse =
+          new Task<Void>() {
 
-          @Override
-          protected Void call() throws Exception {
-            setName(name, "chat1.txt", chatCompletionRequest1);
-            enableChat();
-            return null;
-          }
-        };
-    Thread responseThread = new Thread(generateResponse);
+            @Override
+            protected Void call() throws Exception {
+              setName(name, "chat1.txt", chatCompletionRequest1);
+              enableChat();
+              return null;
+            }
+          };
+      Thread responseThread = new Thread(generateResponse);
 
-    if (greeting1) {
-      appendSystemMessage(
-          "A man is staring at the description card mindlessly. You decide to name him Suspect"
-              + " 2");
-      greeting1 = false;
-      responseThread.setDaemon(true);
-      responseThread.start();
+      if (greeting1) {
+        appendSystemMessage(
+            "A man is staring at the description card mindlessly. You decide to name him Suspect"
+                + " 2");
+        greeting1 = false;
+        responseThread.setDaemon(true);
+        responseThread.start();
+      }
+
+      if (clueFound) {
+        appendSystemMessage("You notice Suspect 1 has got some white dust on his shirt.");
+      }
     }
 
-    if (clueFound) {
-      appendSystemMessage("You notice Suspect 1 has got some white dust on his shirt.");
+    if (clickedRectangle == rectPerson2) {
+      name = context.getName("rectPerson2");
+      clickedRectangle.setStyle("-fx-opacity: 0.2");
+      rectPerson1.setStyle("-fx-opacity: 0");
+      rectPerson3.setStyle("-fx-opacity: 0");
+      rectStatue.setStyle("-fx-opacity: 0");
+      setPerson2 = true;
+      setPerson1 = false;
+      setPerson3 = false;
+      setStatue = false;
+
+      Task<Void> generateResponse =
+          new Task<Void>() {
+
+            @Override
+            protected Void call() throws Exception {
+              setName(name, "chat2.txt", chatCompletionRequest2);
+              enableChat();
+              return null;
+            }
+          };
+      Thread responseThread = new Thread(generateResponse);
+      if (greeting2) {
+        appendSystemMessage(
+            "You notice a man wondering around looking for something. You noted him as Suspect 1");
+        greeting2 = false;
+        responseThread.setDaemon(true);
+        responseThread.start();
+      }
     }
-  }
 
-  @FXML
-  private void handleRectangleClickPerson2(MouseEvent event) throws IOException {
-    Rectangle clickedRectangle = (Rectangle) event.getSource();
-    name = context.getName("rectPerson2");
-    clickedRectangle.setStyle("-fx-opacity: 0.2");
-    rectPerson1.setStyle("-fx-opacity: 0");
-    rectPerson3.setStyle("-fx-opacity: 0");
-    rectStatue.setStyle("-fx-opacity: 0");
-    setPerson2 = true;
-    setPerson1 = false;
-    setPerson3 = false;
+    if (clickedRectangle == rectPerson3) {
+      name = context.getName("rectPerson3");
+      clickedRectangle.setStyle("-fx-opacity: 0.2");
+      rectPerson2.setStyle("-fx-opacity: 0");
+      rectPerson1.setStyle("-fx-opacity: 0");
+      rectStatue.setStyle("-fx-opacity: 0");
+      setPerson3 = true;
+      setPerson2 = false;
+      setPerson1 = false;
+      setStatue = false;
 
-    Task<Void> generateResponse =
-        new Task<Void>() {
+      Task<Void> generateResponse =
+          new Task<Void>() {
 
-          @Override
-          protected Void call() throws Exception {
-            setName(name, "chat2.txt", chatCompletionRequest2);
-            enableChat();
-            return null;
-          }
-        };
-    Thread responseThread = new Thread(generateResponse);
-    if (greeting2) {
-      appendSystemMessage(
-          "You notice a man wondering around looking for something. You noted him as Suspect 1");
-      greeting2 = false;
-      responseThread.setDaemon(true);
-      responseThread.start();
+            @Override
+            protected Void call() throws Exception {
+              setName(name, "chat3.txt", chatCompletionRequest3);
+              enableChat();
+              return null;
+            }
+          };
+      Thread responseThread = new Thread(generateResponse);
+
+      if (greeting3) {
+        appendSystemMessage(
+            "A beautiful woman works around the museum, she seems interested in those statues. You"
+                + " called her Suspect 3 anyways");
+        greeting3 = false;
+        responseThread.setDaemon(true);
+        responseThread.start();
+      }
     }
-  }
 
-  @FXML
-  private void handleRectangleClickPerson3(MouseEvent event) throws IOException {
-    Rectangle clickedRectangle = (Rectangle) event.getSource();
-    name = context.getName("rectPerson3");
-    clickedRectangle.setStyle("-fx-opacity: 0.2");
-    rectPerson2.setStyle("-fx-opacity: 0");
-    rectPerson1.setStyle("-fx-opacity: 0");
-    rectStatue.setStyle("-fx-opacity: 0");
-    setPerson3 = true;
-    setPerson2 = false;
-    setPerson1 = false;
-
-    Task<Void> generateResponse =
-        new Task<Void>() {
-
-          @Override
-          protected Void call() throws Exception {
-            setName(name, "chat3.txt", chatCompletionRequest3);
-            enableChat();
-            return null;
-          }
-        };
-    Thread responseThread = new Thread(generateResponse);
-
-    if (greeting3) {
-      appendSystemMessage(
-          "A beautiful woman works around the museum, she seems interested in those statues. You"
-              + " called her Suspect 3 anyways");
-      greeting3 = false;
-      responseThread.setDaemon(true);
-      responseThread.start();
+    if (clickedRectangle == rectStatue) {
+      clickedRectangle.setStyle("-fx-opacity: 0.2");
+      rectPerson2.setStyle("-fx-opacity: 0");
+      rectPerson3.setStyle("-fx-opacity: 0");
+      rectPerson1.setStyle("-fx-opacity: 0");
+      setPerson1 = false;
+      setPerson2 = false;
+      setPerson3 = false;
+      setStatue = true;
+      if (greeting4) {
+        appendSystemMessage(
+            new String(
+                Files.readAllBytes(Paths.get("src\\main\\resources\\prompts\\chatClue.txt"))));
+        greeting4 = false;
+      } else {
+        appendSystemMessage("You got nothing more than white dusts on your hands.");
+      }
+      disableChat();
     }
-  }
-
-  @FXML
-  private void handleRectangleClickStatue(MouseEvent event) throws IOException {
-    Rectangle clickedRectangle = (Rectangle) event.getSource();
-    clickedRectangle.setStyle("-fx-opacity: 0.2");
-    rectPerson2.setStyle("-fx-opacity: 0");
-    rectPerson3.setStyle("-fx-opacity: 0");
-    rectPerson1.setStyle("-fx-opacity: 0");
-    if (greeting4) {
-      appendSystemMessage(
-          new String(Files.readAllBytes(Paths.get("src\\main\\resources\\prompts\\chatClue.txt"))));
-      greeting4 = false;
-    } else {
-      appendSystemMessage("You got nothing more than white dusts on your hands.");
-    }
-    disableChat();
   }
 
   @FXML
@@ -323,7 +354,31 @@ public class RoomController {
    */
   @FXML
   private void handleGuessClick(ActionEvent event) throws IOException {
-    context.handleGuessClick();
+    if (gameEnd) {
+      return;
+    }
+    if (!setPerson1 & !setPerson2 & !setPerson3) {
+      ChatMessage msg = new ChatMessage("user", "I need to choose someone.", "You");
+      // TextToSpeech.speak(msg.getContent());
+      appendChatMessage(msg);
+      return;
+    }
+    btnFlaw.setStyle("-fx-background-color: RED;" + "-fx-font-size: 28;");
+    btnFlaw.setText("Caught");
+    disableChat();
+    if (name == context.getRectIdToGuess()) {
+      ChatMessage msgWin = new ChatMessage("user", name + "is guilty! Send to jail!", "You");
+      // TextToSpeech.speak(msgWin.getContent());
+      appendChatMessage(msgWin);
+      appendSystemMessage("You won the game.");
+    } else {
+      ChatMessage msgLose = new ChatMessage("user", name + "is not guilty! I am wrong!", "You");
+      // TextToSpeech.speak(msgLose.getContent());
+      appendChatMessage(msgLose);
+      appendSystemMessage("You Lost the game.");
+    }
+
+    gameEnd = true;
   }
 
   /**
@@ -357,7 +412,7 @@ public class RoomController {
    *
    * @param msg the chat message to append
    */
-  private void appendChatMessage(ChatMessage msg) {
+  public void appendChatMessage(ChatMessage msg) {
     txtChat.appendText(msg.getName() + ": " + msg.getContent() + "\n\n");
   }
 
@@ -366,7 +421,7 @@ public class RoomController {
    *
    * @param msg the chat message to append
    */
-  private void appendSystemMessage(String msg) {
+  public void appendSystemMessage(String msg) {
     txtChat.appendText("[" + msg + "]\n\n");
   }
 

@@ -2,6 +2,7 @@ package nz.ac.auckland.se206.states;
 
 import java.io.IOException;
 import javafx.scene.input.MouseEvent;
+import nz.ac.auckland.apiproxy.chat.openai.ChatMessage;
 import nz.ac.auckland.se206.GameStateContext;
 import nz.ac.auckland.se206.speech.TextToSpeech;
 
@@ -32,16 +33,15 @@ public class Guessing implements GameState {
    */
   @Override
   public void handleRectangleClick(MouseEvent event, String rectangleId) throws IOException {
-    if (rectangleId.equals("rectCashier") || rectangleId.equals("rectWaitress")) {
-      TextToSpeech.speak("You should click on the customers");
-      return;
-    }
 
     String clickedName = context.getName(rectangleId);
     if (rectangleId.equals(context.getRectIdToGuess())) {
-      TextToSpeech.speak("Correct! You won! This is the " + clickedName);
+      ChatMessage msgWin = new ChatMessage("user", clickedName + "is guilty! Send to jail!", "You");
+      TextToSpeech.speak(msgWin.getContent());
     } else {
-      TextToSpeech.speak("You lost! This is the " + clickedName);
+      ChatMessage msgLose =
+          new ChatMessage("user", clickedName + "is not Guilt, I was wrong!", "You");
+      TextToSpeech.speak(msgLose.getContent());
     }
     context.setState(context.getGameOverState());
   }
@@ -54,6 +54,8 @@ public class Guessing implements GameState {
    */
   @Override
   public void handleGuessClick() throws IOException {
-    TextToSpeech.speak("You have already guessed!");
+    // TextToSpeech.speak(msg.getContent());
+
+    context.setState(context.getGameOverState());
   }
 }
