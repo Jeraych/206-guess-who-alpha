@@ -85,6 +85,7 @@ public class RoomController {
     me = "You";
     gameEnd = false;
     ApiProxyConfig config = ApiProxyConfig.readConfig();
+    // create new chat histories
     chatCompletionRequest1 =
         new ChatCompletionRequest(config)
             .setN(1)
@@ -112,12 +113,14 @@ public class RoomController {
     minute = 2;
     timerString = "%d:%02d:%02d";
     timer.setText(String.format(timerString, minute, second, milliSecond));
+    // create timer with 2 minutes countdown
     clock =
         new Timeline(
             new KeyFrame(
                 Duration.millis(10),
                 e -> {
                   if (gameEnd) {
+                    // stops timer without starting 10s final countdown
                     clock.stop();
                   }
                   milliSecond--;
@@ -128,6 +131,7 @@ public class RoomController {
                       second = 59;
                       minute--;
                       if (minute < 0) {
+                        // timer is up
                         milliSecond = 0;
                         second = 0;
                         minute = 0;
@@ -150,6 +154,7 @@ public class RoomController {
 
     finalSecond = 10;
 
+    // create final countdown wit 10 seconds
     countdown =
         new Timeline(
             new KeyFrame(
@@ -470,7 +475,7 @@ public class RoomController {
   }
 
   /**
-   * Sends a message to the GPT model.
+   * Sends a message to the GPT model. Using different chat history to identify who's talking.
    *
    * @param event the action event triggered by the send button
    * @throws ApiProxyException if there is an error communicating with the API proxy
@@ -485,6 +490,7 @@ public class RoomController {
     chatting = true;
     interacted = true;
     ChatCompletionRequest chatCompletionRequest;
+    // Separate chat history to avoid conflicts
     if (setPerson1) {
       chatCompletionRequest = chatCompletionRequest1;
     } else if (setPerson2) {
@@ -495,6 +501,7 @@ public class RoomController {
     txtInput.clear();
     ChatMessage msg = new ChatMessage("user", message, me);
     appendChatMessage(msg);
+    // Thread to run in concurrent with GUI
     Task<Void> generateResponse =
         new Task<Void>() {
 
