@@ -68,6 +68,9 @@ public class RoomController {
   private boolean setPerson3 = false;
   private boolean setStatue = false;
   private Rectangle clickedRectangle;
+  private boolean chatting = false;
+  private boolean interacted = false;
+  private boolean interactedStatue = false;
   private boolean gameEnd;
 
   private ChatCompletionRequest chatCompletionRequest1;
@@ -127,7 +130,7 @@ public class RoomController {
                     milliSecond = 99;
                     second--;
                     if (second < 0) {
-                      second = 1;
+                      second = 59;
                       minute--;
                       if (minute < 0) {
                         milliSecond = 0;
@@ -141,6 +144,7 @@ public class RoomController {
                         btnFlaw.setText("Arrest!");
                         // TextToSpeech.speak(msg.getContent());
                         appendChatMessage(msg);
+                        finalCountdown.setText(Integer.toString(finalSecond));
                         countdown.play();
                       }
                     }
@@ -158,11 +162,9 @@ public class RoomController {
             new KeyFrame(
                 Duration.seconds(1),
                 event -> {
-                  finalCountdown.setText(Integer.toString(finalSecond));
                   if (gameEnd) {
-                    clock.stop();
+                    countdown.stop();
                   }
-
                   finalSecond--;
                   if (finalSecond < 0) {
                     finalSecond = 0;
@@ -207,7 +209,7 @@ public class RoomController {
    */
   @FXML
   private void handleRectangleClick(MouseEvent event) throws IOException {
-    if (gameEnd) {
+    if (gameEnd || chatting) {
       return;
     }
     clickedRectangle = (Rectangle) event.getSource();
@@ -230,6 +232,7 @@ public class RoomController {
             protected Void call() throws Exception {
               setName(name, "chat1.txt", chatCompletionRequest1);
               enableChat();
+              chatting = false;
               return null;
             }
           };
@@ -242,6 +245,7 @@ public class RoomController {
         greeting1 = false;
         responseThread.setDaemon(true);
         responseThread.start();
+        chatting = true;
       }
 
       if (clueFound) {
@@ -267,6 +271,7 @@ public class RoomController {
             protected Void call() throws Exception {
               setName(name, "chat2.txt", chatCompletionRequest2);
               enableChat();
+              chatting = false;
               return null;
             }
           };
@@ -277,6 +282,7 @@ public class RoomController {
         greeting2 = false;
         responseThread.setDaemon(true);
         responseThread.start();
+        chatting = true;
       }
     }
 
@@ -298,6 +304,7 @@ public class RoomController {
             protected Void call() throws Exception {
               setName(name, "chat3.txt", chatCompletionRequest3);
               enableChat();
+              chatting = false;
               return null;
             }
           };
@@ -310,6 +317,7 @@ public class RoomController {
         greeting3 = false;
         responseThread.setDaemon(true);
         responseThread.start();
+        chatting = true;
       }
     }
 
@@ -318,6 +326,7 @@ public class RoomController {
       rectPerson2.setStyle("-fx-opacity: 0");
       rectPerson3.setStyle("-fx-opacity: 0");
       rectPerson1.setStyle("-fx-opacity: 0");
+      interactedStatue = true;
       setPerson1 = false;
       setPerson2 = false;
       setPerson3 = false;
@@ -357,27 +366,40 @@ public class RoomController {
     if (gameEnd) {
       return;
     }
-    if (!setPerson1 & !setPerson2 & !setPerson3) {
+    if (!setPerson1 && !setPerson2 && !setPerson3) {
       ChatMessage msg = new ChatMessage("user", "I need to choose someone.", "You");
       // TextToSpeech.speak(msg.getContent());
       appendChatMessage(msg);
       return;
     }
+    if (interactedStatue == false) {
+      ChatMessage msg = new ChatMessage("user", "I need to investigate the scene.", "You");
+      // TextToSpeech.speak(msg.getContent());
+      appendChatMessage(msg);
+      return;
+    }
+    if (interacted == false) {
+      ChatMessage msg = new ChatMessage("user", "I need to talk to someone.", "You");
+      // TextToSpeech.speak(msg.getContent());
+      appendChatMessage(msg);
+      return;
+    }
+
     btnFlaw.setStyle("-fx-background-color: RED;" + "-fx-font-size: 28;");
     btnFlaw.setText("Caught");
-    disableChat();
+
     if (name == context.getRectIdToGuess()) {
-      ChatMessage msgWin = new ChatMessage("user", name + "is guilty! Send to jail!", "You");
+      ChatMessage msgWin = new ChatMessage("user", name + " is guilty! Send to jail!", "You");
       // TextToSpeech.speak(msgWin.getContent());
       appendChatMessage(msgWin);
       appendSystemMessage("You won the game.");
     } else {
-      ChatMessage msgLose = new ChatMessage("user", name + "is not guilty! I am wrong!", "You");
+      ChatMessage msgLose = new ChatMessage("user", name + " is not guilty! I am wrong!", "You");
       // TextToSpeech.speak(msgLose.getContent());
       appendChatMessage(msgLose);
-      appendSystemMessage("You Lost the game.");
+      appendSystemMessage("You lost the game.");
     }
-
+    disableChat();
     gameEnd = true;
   }
 
@@ -400,7 +422,7 @@ public class RoomController {
   public void setName(String name, String id, ChatCompletionRequest chatCompletionRequest) {
     this.name = name;
     try {
-
+      disableChat();
       runGpt(new ChatMessage("system", getSystemPrompt(id), name), chatCompletionRequest);
     } catch (ApiProxyException e) {
       e.printStackTrace();
@@ -462,6 +484,7 @@ public class RoomController {
     if (message.isEmpty()) {
       return;
     }
+    interacted = true;
     ChatCompletionRequest chatCompletionRequest;
     if (setPerson1) {
       chatCompletionRequest = chatCompletionRequest1;
