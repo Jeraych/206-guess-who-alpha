@@ -3,7 +3,6 @@ package nz.ac.auckland.se206.states;
 import java.io.IOException;
 import javafx.scene.input.MouseEvent;
 import nz.ac.auckland.se206.GameStateContext;
-import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * The GameOver state of the game. Handles interactions after the game has ended, informing the
@@ -36,7 +35,6 @@ public class GameOver implements GameState {
       return;
     }
     String clickedName = context.getName(rectangleId);
-    TextToSpeech.speak("Game Over, you have already guessed! This is the " + clickedName);
   }
 
   /**
@@ -46,7 +44,5 @@ public class GameOver implements GameState {
    * @throws IOException if there is an I/O error
    */
   @Override
-  public void handleGuessClick() throws IOException {
-    TextToSpeech.speak("You have already guessed!");
-  }
+  public void handleGuessClick() throws IOException {}
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import javafx.scene.input.MouseEvent;
 import nz.ac.auckland.apiproxy.chat.openai.ChatMessage;
 import nz.ac.auckland.se206.GameStateContext;
-import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * The Guessing state of the game. Handles the logic for when the player is making a guess about the
@@ -37,11 +36,9 @@ public class Guessing implements GameState {
     String clickedName = context.getName(rectangleId);
     if (rectangleId.equals(context.getRectIdToGuess())) {
       ChatMessage msgWin = new ChatMessage("user", clickedName + "is guilty! Send to jail!", "You");
-      TextToSpeech.speak(msgWin.getContent());
     } else {
       ChatMessage msgLose =
           new ChatMessage("user", clickedName + "is not Guilt, I was wrong!", "You");
-      TextToSpeech.speak(msgLose.getContent());
     }
     context.setState(context.getGameOverState());
   }
@@ -54,7 +51,6 @@ public class Guessing implements GameState {
    */
   @Override
   public void handleGuessClick() throws IOException {
-    // TextToSpeech.speak(msg.getContent());
 
     context.setState(context.getGameOverState());
   }

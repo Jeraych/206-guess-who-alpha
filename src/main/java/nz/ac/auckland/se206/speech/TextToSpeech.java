@@ -1,9 +1,12 @@
 package nz.ac.auckland.se206.speech;
 
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Scanner;
 import javafx.concurrent.Task;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
@@ -31,7 +34,7 @@ public class TextToSpeech {
     Task<Void> backgroundTask =
         new Task<>() {
           @Override
-          protected Void call() {
+          protected Void call() throws IOException {
             try {
               ApiProxyConfig config = ApiProxyConfig.readConfig();
               Provider provider = Provider.GOOGLE;
@@ -43,8 +46,16 @@ public class TextToSpeech {
               TextToSpeechResult ttsResult = ttsRequest.execute();
               String audioUrl = ttsResult.getAudioUrl();
 
-              try (InputStream inputStream =
-                  new BufferedInputStream(new URL(audioUrl).openStream())) {
+              FileWriter write = new FileWriter("src/main/resources/sounds/audio.txt");
+              write.write(audioUrl);
+              write.close();
+
+              File file = new File("src/main/resources/sounds/audio.txt");
+              Scanner urlReader = new Scanner(file);
+              String url = urlReader.nextLine();
+              urlReader.close();
+
+              try (InputStream inputStream = new BufferedInputStream(new URL(url).openStream())) {
                 Player player = new Player(inputStream);
                 player.play();
               } catch (JavaLayerException | IOException e) {

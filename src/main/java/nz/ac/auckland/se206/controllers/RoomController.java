@@ -27,6 +27,7 @@ import nz.ac.auckland.apiproxy.config.ApiProxyConfig;
 import nz.ac.auckland.apiproxy.exceptions.ApiProxyException;
 import nz.ac.auckland.se206.GameStateContext;
 import nz.ac.auckland.se206.prompts.PromptEngineering;
+import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * Controller class for the room view. Handles user interactions within the room where the user can
@@ -34,19 +35,6 @@ import nz.ac.auckland.se206.prompts.PromptEngineering;
  */
 public class RoomController {
 
-  @FXML private Rectangle rectPerson1;
-  @FXML private Rectangle rectPerson2;
-  @FXML private Rectangle rectPerson3;
-  @FXML private Rectangle rectStatue;
-  @FXML private Text timer;
-  @FXML private Text finalCountdown;
-
-  @FXML private TextArea txtChat;
-  @FXML private TextField txtInput;
-  @FXML private Button btnSend;
-  @FXML private Button btnFlaw;
-
-  private static boolean isFirstTimeInit = true;
   private static GameStateContext context = new GameStateContext();
   private int milliSecond;
   private int second;
@@ -54,8 +42,6 @@ public class RoomController {
   private Timeline clock;
   private String timerString;
   private Timeline countdown;
-  private boolean timerEnd;
-  private boolean countdownEnd;
   private int finalSecond;
   private boolean clueFound = false;
   private boolean greeting1 = true;
@@ -66,21 +52,31 @@ public class RoomController {
   private boolean setPerson1 = false;
   private boolean setPerson2 = false;
   private boolean setPerson3 = false;
-  private boolean setStatue = false;
   private Rectangle clickedRectangle;
   private boolean chatting = false;
   private boolean interacted = false;
   private boolean interactedStatue = false;
   private boolean gameEnd;
-
   private ChatCompletionRequest chatCompletionRequest1;
   private ChatCompletionRequest chatCompletionRequest2;
   private ChatCompletionRequest chatCompletionRequest3;
   private String name;
 
+  @FXML private Rectangle rectPerson1;
+  @FXML private Rectangle rectPerson2;
+  @FXML private Rectangle rectPerson3;
+  @FXML private Rectangle rectStatue;
+  @FXML private Text timer;
+  @FXML private Text finalCountdown;
+  @FXML private TextArea txtChat;
+  @FXML private TextField txtInput;
+  @FXML private Button btnSend;
+  @FXML private Button btnFlaw;
+
   /**
    * Initializes the room view. If it's the first time initialization, it will provide instructions
-   * via text-to-speech.
+   * via text-to-TextToSpeech. Starts off the timer and final countdown of 2 minutes and 10 seconds
+   * respectively.
    *
    * @throws ApiProxyException
    */
@@ -110,8 +106,7 @@ public class RoomController {
     ChatMessage start =
         new ChatMessage("user", "Hurry, we have two minutes till suspects escape.", me);
     appendChatMessage(start);
-    // TextToSpeech.speak(start.getContent());
-    timerEnd = false;
+    TextToSpeech.speak(start.getContent());
     milliSecond = 0;
     second = 0;
     minute = 2;
@@ -136,13 +131,12 @@ public class RoomController {
                         milliSecond = 0;
                         second = 0;
                         minute = 0;
-                        timerEnd = true;
                         clock.stop();
                         ChatMessage msg =
                             new ChatMessage("user", "Arrest a suspect, quick!", "You");
                         btnFlaw.setStyle("-fx-font-size: 28;" + "-fx-color: BLACK;");
                         btnFlaw.setText("Arrest!");
-                        // TextToSpeech.speak(msg.getContent());
+                        TextToSpeech.speak(msg.getContent());
                         appendChatMessage(msg);
                         finalCountdown.setText(Integer.toString(finalSecond));
                         countdown.play();
@@ -154,7 +148,6 @@ public class RoomController {
     clock.setCycleCount(Animation.INDEFINITE);
     clock.play();
 
-    countdownEnd = false;
     finalSecond = 10;
 
     countdown =
@@ -168,10 +161,10 @@ public class RoomController {
                   finalSecond--;
                   if (finalSecond < 0) {
                     finalSecond = 0;
-                    countdownEnd = true;
                     countdown.stop();
                     ChatMessage msgWin = new ChatMessage("user", "Suspects escaped. (Sigh)", "You");
-                    // TextToSpeech.speak(msgWin.getContent());
+
+                    TextToSpeech.speak(msgWin.getContent());
                     appendChatMessage(msgWin);
                     appendSystemMessage("You lost the game.");
                     gameEnd = true;
@@ -223,7 +216,6 @@ public class RoomController {
       setPerson1 = true;
       setPerson2 = false;
       setPerson3 = false;
-      setStatue = false;
 
       Task<Void> generateResponse =
           new Task<Void>() {
@@ -262,7 +254,6 @@ public class RoomController {
       setPerson2 = true;
       setPerson1 = false;
       setPerson3 = false;
-      setStatue = false;
 
       Task<Void> generateResponse =
           new Task<Void>() {
@@ -295,7 +286,6 @@ public class RoomController {
       setPerson3 = true;
       setPerson2 = false;
       setPerson1 = false;
-      setStatue = false;
 
       Task<Void> generateResponse =
           new Task<Void>() {
@@ -330,7 +320,7 @@ public class RoomController {
       setPerson1 = false;
       setPerson2 = false;
       setPerson3 = false;
-      setStatue = true;
+
       if (greeting4) {
         appendSystemMessage(
             new String(
@@ -368,19 +358,22 @@ public class RoomController {
     }
     if (!setPerson1 && !setPerson2 && !setPerson3) {
       ChatMessage msg = new ChatMessage("user", "I need to choose someone.", "You");
-      // TextToSpeech.speak(msg.getContent());
+
+      TextToSpeech.speak(msg.getContent());
       appendChatMessage(msg);
       return;
     }
     if (interactedStatue == false) {
       ChatMessage msg = new ChatMessage("user", "I need to investigate the scene.", "You");
-      // TextToSpeech.speak(msg.getContent());
+
+      TextToSpeech.speak(msg.getContent());
       appendChatMessage(msg);
       return;
     }
     if (interacted == false) {
       ChatMessage msg = new ChatMessage("user", "I need to talk to someone.", "You");
-      // TextToSpeech.speak(msg.getContent());
+
+      TextToSpeech.speak(msg.getContent());
       appendChatMessage(msg);
       return;
     }
@@ -390,12 +383,14 @@ public class RoomController {
 
     if (name == context.getRectIdToGuess()) {
       ChatMessage msgWin = new ChatMessage("user", name + " is guilty! Send to jail!", "You");
-      // TextToSpeech.speak(msgWin.getContent());
+
+      TextToSpeech.speak(msgWin.getContent());
       appendChatMessage(msgWin);
       appendSystemMessage("You won the game.");
     } else {
       ChatMessage msgLose = new ChatMessage("user", name + " is not guilty! I am wrong!", "You");
-      // TextToSpeech.speak(msgLose.getContent());
+
+      TextToSpeech.speak(msgLose.getContent());
       appendChatMessage(msgLose);
       appendSystemMessage("You lost the game.");
     }
@@ -458,12 +453,15 @@ public class RoomController {
       throws ApiProxyException {
     chatCompletionRequest.addMessage(msg);
     try {
+      disableChat();
       ChatCompletionResult chatCompletionResult = chatCompletionRequest.execute();
       Choice result = chatCompletionResult.getChoices().iterator().next();
       result.getChatMessage().setName(name);
       chatCompletionRequest.addMessage(result.getChatMessage());
       appendChatMessage(result.getChatMessage());
-      // TextToSpeech.speak(result.getChatMessage().getContent());
+
+      TextToSpeech.speak(result.getChatMessage().getContent());
+      enableChat();
       return result.getChatMessage();
     } catch (ApiProxyException e) {
       e.printStackTrace();
@@ -484,6 +482,7 @@ public class RoomController {
     if (message.isEmpty()) {
       return;
     }
+    chatting = true;
     interacted = true;
     ChatCompletionRequest chatCompletionRequest;
     if (setPerson1) {
@@ -496,6 +495,18 @@ public class RoomController {
     txtInput.clear();
     ChatMessage msg = new ChatMessage("user", message, me);
     appendChatMessage(msg);
-    runGpt(msg, chatCompletionRequest);
+    Task<Void> generateResponse =
+        new Task<Void>() {
+
+          @Override
+          protected Void call() throws Exception {
+            runGpt(msg, chatCompletionRequest);
+            chatting = false;
+            return null;
+          }
+        };
+    Thread responseThread = new Thread(generateResponse);
+    responseThread.setDaemon(true);
+    responseThread.start();
   }
 }
