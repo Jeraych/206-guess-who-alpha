@@ -2,6 +2,9 @@
 
 # SOFTENG206 Guess Who Alpha
 
+# Don’t Waste Time Making a Pretty GUI
+The purpose of the Alpha version is to prototype the core functionality requested below. You do not have time to spend making your GUI look great. So, do not waste time and effort using CSS or complicated layouts. We care about functionality. Keep it simple, even if it looks boring—that’s completely fine! The only usability aspect you should care about is that the GUI does not freeze.
+
 ## To setup the API to access Chat Completions and TTS
 
 - add in the root of the project (i.e., the same level where `pom.xml` is located) a file named `apiproxy.config`
